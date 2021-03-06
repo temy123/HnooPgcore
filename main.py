@@ -17,6 +17,9 @@ class GameModel:
         self.model = render_model
         self.rect = render_rect
 
+    def _get_center(self):
+        return width / 2, height / 2
+
 
 class HelloWorldModel(GameModel):
 
@@ -28,6 +31,20 @@ class HelloWorldModel(GameModel):
         render_rect = render_text.get_rect()  # 생성한 이미지의 rect 객체를 가져온다
         render_rect.center = (width / 2, height / 2)  # 해당 rect의 중앙을 화면 중앙에 맞춘다
         super().__init__(render_text, render_rect)
+
+
+class ToadKing(GameModel):
+    def __init__(self):
+        self.sprite = pygame.image.load('img/character/1 Toad_king/Calm.png')
+        self.rect = self.sprite.get_rect()
+        self.rect.center = self._get_center()
+        super().__init__(self.sprite, self.rect)
+
+    def move_down(self):
+        self.rect.bottom += 5
+
+    def move_up(self):
+        self.rect.bottom -= 5
 
 
 class GameComponent:
@@ -60,15 +77,22 @@ if __name__ == '__main__':
 
     # 렌더 시작
     while True:  # 아래의 코드를 무한 반복한다.
+        text_model = HelloWorldModel()
+        image_model = ToadKing()
+
         for event in pygame.event.get():  # 발생한 입력 event 목록의 event마다 검사
             if event.type == QUIT:  # event의 type이 QUIT에 해당할 경우
                 pygame.quit()  # pygame을 종료한다
                 sys.exit()  # 창을 닫는다
 
-        text_model = HelloWorldModel()
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_DOWN:
+                    image_model.move_down()
+                elif event.key == pygame.K_UP:
+                    image_model.move_up()
 
         game.fill(white)
-        game.show(text_model)
+        game.show(image_model)
 
         pygame.display.update()  # 화면을 업데이트한다
         game.clock()  # 화면 표시 회수 설정만큼 루프의 간격을 둔다
