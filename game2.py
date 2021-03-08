@@ -6,12 +6,12 @@ black = (0, 0, 0)
 
 
 # TODO: ThisGameModel 이름 변경 필요,
-class ThisGameModel(GameModel):
+class GameTwoModel(GameModel):
     def move_to_center(self, component: GameComponent):
         self.rect.center = component.get_center()
 
 
-class HelloWorldModel(ThisGameModel):
+class HelloWorldModel(GameTwoModel):
 
     def __init__(self):
         gulim_font = pygame.font.SysFont('굴림', 70)  # 서체 설정
@@ -23,7 +23,7 @@ class HelloWorldModel(ThisGameModel):
         super().__init__(render_text)
 
 
-class Beetle(ThisGameModel):
+class Beetle(GameTwoModel):
 
     def __init__(self):
         self.sprite = pygame.image.load('img/character/2 Rhinoceros-beetle/Calm.png')

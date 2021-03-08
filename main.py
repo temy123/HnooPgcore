@@ -72,10 +72,6 @@ if __name__ == '__main__':
 
     pygame.init()
 
-    GAMES[I_GAME_1] = Game1(width, height, fps, I_GAME_1)
-    GAMES[I_GAME_2] = Game2(width, height, fps, I_GAME_2)
-    GAMES[I_INTRO] = Game3(width, height, fps, I_INTRO)
-    GAMES[I_MAIN_MENU] = Game4(width, height, fps, I_MAIN_MENU)
     # 렌더 시작
     while True:  # 아래의 코드를 무한 반복한다.
         print('1. INIT NEW GAME')
@@ -86,23 +82,26 @@ if __name__ == '__main__':
         #
         # status ==
 
-        GAMES[I_GAME_2].update()
+        GAMES[I_GAME_1] = Game1(width, height, fps, I_GAME_1)
+        GAMES[I_GAME_2] = Game2(width, height, fps, I_GAME_2)
+        GAMES[I_INTRO] = Game3(width, height, fps, I_INTRO)
+        GAMES[I_MAIN_MENU] = Game4(width, height, fps, I_MAIN_MENU)
 
-        # running_game = select_game()
-        # running_game.start()
-        # print('2. ================ selected game : ' + str(status))
-        #
-        # while status == running_game.get_status():
-        #     running_game.update()
-        #
-        #     # 게임이 끝난 경우 에는 메인메뉴로
-        #     # status = I_MAIN_MENU if is_game_running(running_game) else status
-        #
-        #     handle_global_keys()
-        #     print('3. status to {status} in while'.format(status=status))
-        #     print('4. equals status {result}'.format(result=status == running_game.get_status()))
-        #
-        #     if not is_game_running(running_game):
-        #         break
-        #
-        # stop_games()
+        running_game = select_game()
+        running_game.start()
+        print('2. ================ selected game : ' + str(status))
+
+        while status == running_game.get_status():
+            running_game.update()
+
+            # 게임이 끝난 경우 에는 메인메뉴로
+            # status = I_MAIN_MENU if is_game_running(running_game) else status
+
+            handle_global_keys()
+
+            print('4. equals status {result}'.format(result=status == running_game.get_status()))
+
+        if not is_game_running(running_game):
+            break
+
+        stop_games()

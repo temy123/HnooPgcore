@@ -72,13 +72,13 @@ class GameModel:
 
 class BaseGame:
     __running = False
-    model = []
 
     def __init__(self, fps, status):
         self.fps = fps
         self.__clock = pygame.time.Clock()
         self.start()
         self.status = status
+        self.model = []
 
     def start(self):
         self.__running = True
