@@ -40,17 +40,20 @@ class ToadKing(ThisGameModel):
         self.rect.move_ip(-5, 0)
 
     def move_right(self):
-        self.rect.move_ip(-5, 0)
+        self.rect.move_ip(5, 0)
 
     def move_to_center(self, component: GameComponent):
         self.rect.center = component.get_center()
 
-    def process_key(self, event_):
-        if KeyBindings.is_key_press_down(event_):
-            if KeyBindings.is_key_up(event_):
-                self.move_up()
-            if KeyBindings.is_key_down(event_):
-                self.move_down()
+    def bind_pressed_key(self):
+        if KeyBindings.Pressed.is_key_pressed_up():
+            self.move_up()
+        if KeyBindings.Pressed.is_key_pressed_down():
+            self.move_down()
+        if KeyBindings.Pressed.is_key_pressed_left():
+            self.move_left()
+        if KeyBindings.Pressed.is_key_pressed_right():
+            self.move_right()
 
 
 class Game1(BaseGame):
@@ -59,8 +62,11 @@ class Game1(BaseGame):
         super().__init__(fps)
         self.component = GameComponent(width, height)
 
+        boss1 = ToadKing()
+        boss1.move_to_center(self.component)
+
         self.add_game_model('hello', HelloWorldModel())
-        self.add_game_model('boss1', ToadKing())
+        self.add_game_model('boss1', boss1)
 
     def _make_screen(self):
         self.component.fill(white)

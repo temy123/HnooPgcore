@@ -7,6 +7,27 @@ from pygame.locals import *
 
 
 class KeyBindings:
+    class Pressed:
+        @staticmethod
+        def is_key_pressed_left():
+            return pygame.key.get_pressed()[pygame.K_LEFT]
+
+        @staticmethod
+        def is_key_pressed_right():
+            return pygame.key.get_pressed()[pygame.K_RIGHT]
+
+        @staticmethod
+        def is_key_pressed_up():
+            return pygame.key.get_pressed()[pygame.K_UP]
+
+        @staticmethod
+        def is_key_pressed_down():
+            return pygame.key.get_pressed()[pygame.K_DOWN]
+
+        @staticmethod
+        def print():
+            print('get_pressed(): ' + str(pygame.key.get_pressed()))
+
     @staticmethod
     def is_key_left(event_):
         return event_.key == pygame.K_LEFT
@@ -24,11 +45,11 @@ class KeyBindings:
         return event_.key == pygame.K_DOWN
 
     @staticmethod
-    def is_key_press_up(event_):
+    def is_key_type_up(event_):
         return event_.type == pygame.KEYUP
 
     @staticmethod
-    def is_key_press_down(event_):
+    def is_key_type_down(event_):
         return event_.type == pygame.KEYDOWN
 
 
@@ -38,7 +59,10 @@ class GameModel:
         self.model = render_model
         self.rect = render_rect
 
-    def process_key(self, event_):
+    def bind_single_key(self, event_):
+        pass
+
+    def bind_pressed_key(self):
         pass
 
 
@@ -54,14 +78,6 @@ class BaseGame:
         self.__clock.tick(self.fps)
 
     def update(self):
-        for event in pygame.event.get():  # 발생한 입력 event 목록의 event마다 검사
-            if event.type == QUIT:  # event의 type이 QUIT에 해당할 경우
-                pygame.quit()  # pygame을 종료한다
-                sys.exit()  # 창을 닫는다
-
-            # KEY 이벤트 작동
-            self._process_key(event)
-
         # 화면 만들기
         self._make_screen()
 
@@ -75,19 +91,19 @@ class BaseGame:
     def _make_screen(self):
         pass
 
-    def _process_key(self, event):
+    def process_single_key_event(self, event):
         for model in self.model:
-            model['game_model'].process_key(event)
+            model['game_model'].bind_single_key(event)
+
+    def process_pressed_key_event(self):
+        for model in self.model:
+            model['game_model'].bind_pressed_key()
 
     def add_game_model(self, key_, game_model):
         self.model.append({'key': key_, 'game_model': game_model})
 
     def get_game_model(self, key_):
         return next((item for item in self.model if item['key'] == key_), None)['game_model']
-
-    def process_key(self):
-        for model in self.model:
-            model.process_key()
 
 
 class GameComponent:
