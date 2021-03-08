@@ -65,19 +65,51 @@ class GameModel:
     def bind_pressed_key(self):
         pass
 
+    def unload(self):
+        self.model = None
+        self.rect = None
+
 
 class BaseGame:
+    __running = False
     model = []
 
-    def __init__(self, fps):
+    def __init__(self, fps, status):
         self.fps = fps
         self.__clock = pygame.time.Clock()
+        self.start()
+        self.status = status
+
+    def start(self):
+        self.__running = True
+
+    def stop(self):
+        self.__running = False
+        # for model in self.model:
+        #     model['key'] = None
+        #     if model['game_model']:
+        #         model['game_model'].unload()
+        # model['game_model'] = None
+        # del model
+
+    def is_running(self):
+        return self.__running
+
+    def get_status(self):
+        return self.status
 
     # 시간 설정
     def clock(self):
         self.__clock.tick(self.fps)
 
     def update(self):
+        # 단일 된 키 입력 처리
+        for event in pygame.event.get():
+            self.process_single_key_event(event)
+
+        # 연속 된 키 입력 처리
+        self.process_pressed_key_event()
+
         # 화면 만들기
         self._make_screen()
 

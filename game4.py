@@ -23,10 +23,10 @@ class HelloWorldModel(ThisGameModel):
         super().__init__(render_text)
 
 
-class ToadKing(ThisGameModel):
+class Effects(ThisGameModel):
 
     def __init__(self):
-        self.sprite = pygame.image.load('img/character/1 Toad_king/Calm.png')
+        self.sprite = pygame.image.load('img/character/4 Additional effects/6.png')
         self.rect = self.sprite.get_rect()
         super().__init__(self.sprite, self.rect)
 
@@ -56,13 +56,13 @@ class ToadKing(ThisGameModel):
             self.move_right()
 
 
-class Game1(BaseGame):
+class Game4(BaseGame):
 
     def __init__(self, width, height, fps, status):
         super().__init__(fps, status)
         self.component = GameComponent(width, height)
 
-        boss1 = ToadKing()
+        boss1 = Effects()
         boss1.move_to_center(self.component)
 
         self.add_game_model('hello', HelloWorldModel())
