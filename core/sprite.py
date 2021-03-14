@@ -20,9 +20,15 @@ class RenderModel(pygame.sprite.Sprite):
         self.current_frame = 0
         self.self_timer = 0
 
-    def load(self, path, total_number_, color_key=None):
+        # 스프라이트 내에 자를 이미지의 시작 위치
+        self.column_x = 0
+        self.column_y = 0
+
+    def load(self, path, total_number_, column_x_index=0, column_y_index=0, color_key=None):
         self.total_number = total_number_
         self.sprite_sheet = pygame.image.load(path).convert_alpha()
+        self.column_x = column_x_index * self.crop_width
+        self.column_y = column_y_index * self.crop_height
 
         self.image = Surface((self.crop_width, self.crop_height))
         if color_key:
@@ -31,7 +37,8 @@ class RenderModel(pygame.sprite.Sprite):
         self.rect = self.image.get_rect()
 
     def get_current_rect(self):
-        return (self.crop_width * self.current_frame, 0,
+        return (self.column_x + (self.crop_width * self.current_frame),
+                self.column_y,
                 self.crop_width, self.crop_height)
 
     # 애니메이션이 가능한 Sprite 이미지의 경우 프레임 단위로 다음 이미지 표시

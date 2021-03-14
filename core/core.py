@@ -10,6 +10,14 @@ from core.sprite import RenderModel
 class KeyBindings:
     class Pressed:
         @staticmethod
+        def is_key_pressed_current(key_):
+            return pygame.key.get_pressed()[key_]
+
+        @staticmethod
+        def is_key_pressed_space():
+            return pygame.key.get_pressed()[pygame.K_SPACE]
+
+        @staticmethod
         def is_key_pressed_left():
             return pygame.key.get_pressed()[pygame.K_LEFT]
 
