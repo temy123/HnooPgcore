@@ -1,5 +1,10 @@
 import pygame
-from core import BaseGame, GameModel, GameComponent, KeyBindings
+from pygame.color import Color
+
+from core.core import BaseGame, GameModel, GameComponent, KeyBindings
+from core.sprite import RenderModel
+
+from enum import Enum, auto
 
 white = (255, 255, 255)
 black = (0, 0, 0)
@@ -8,26 +13,15 @@ black = (0, 0, 0)
 # TODO: ThisGameModel 이름 변경 필요,
 class ThisGameModel(GameModel):
     def move_to_center(self, component: GameComponent):
-        self.rect.center = component.get_center()
+        self.sprite_rect.center = component.get_center()
 
 
-class HelloWorldModel(ThisGameModel):
-
-    def __init__(self):
-        gulim_font = pygame.font.SysFont('굴림', 70)  # 서체 설정
-        render_text = gulim_font.render('Hello, world!', 1, black)
-
-        # .render() 함수에 내용과 안티앨리어싱, 색을 전달하여 글자 이미지 생성
-        # render_rect = render_text.get_rect()  # 생성한 이미지의 rect 객체를 가져온다
-        # render_rect.center = (width / 2, height / 2)  # 해당 rect의 중앙을 화면 중앙에 맞춘다
-        super().__init__(render_text)
-
-
-class ToadKing(ThisGameModel):
+class VirtualBoy(ThisGameModel):
 
     def __init__(self):
-        self.sprite = pygame.image.load('img/character/1 Toad_king/Calm.png')
-        self.rect = self.sprite.get_rect()
+        self.sprite = RenderModel(32, 32)
+        self.sprite.load('img/platform-game/Main Characters/Virtual Guy/Idle (32x32).png', 11, Color(0, 0, 0))
+        self.rect = self.sprite.rect
         super().__init__(self.sprite, self.rect)
 
     def move_down(self):
@@ -56,21 +50,24 @@ class ToadKing(ThisGameModel):
             self.move_right()
 
 
-class Game1(BaseGame):
+class Character(Enum):
+    Hero = auto()
+
+
+class HnooPlatformGame(BaseGame):
 
     def __init__(self, width, height, fps, status):
         super().__init__(fps, status)
         self.component = GameComponent(width, height)
 
-        boss1 = ToadKing()
-        boss1.move_to_center(self.component)
+        player = VirtualBoy()
+        player.move_to_center(self.component)
 
-        self.add_game_model('hello', HelloWorldModel())
-        self.add_game_model('boss1', boss1)
+        self.add_game_model(Character.Hero.name, player)
 
     def _make_screen(self):
         self.component.fill(white)
-        self.component.show(self.get_game_model('boss1'))
+        self.component.show(self.get_game_model(Character.Hero.name))
 
     def process_single_key_event(self, event):
         super().process_single_key_event(event)

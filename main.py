@@ -1,10 +1,10 @@
 import pygame  # pygame 모듈의 임포트
 import sys  # 외장 모듈
-from game1 import Game1
+from game1 import HnooPlatformGame
 from game2 import Game2
 from game3 import Game3
 from game4 import Game4
-from core import GameModel, BaseGame, GameComponent, KeyBindings
+from core.core import GameModel, BaseGame, GameComponent, KeyBindings
 from pygame.locals import *  # QUIT 등의 pygame 상수들을 로드한다.
 
 I_INTRO = -1
@@ -63,8 +63,6 @@ GAMES = {
     I_MAIN_MENU: None,
     I_GAME_1: None,
     I_GAME_2: None,
-    # {'index': I_GAME_1, 'game': Game1(width, height, fps, I_GAME_1)},
-    # {'index': I_GAME_2, 'game': Game2(width, height, fps, I_GAME_2)},
 }
 
 if __name__ == '__main__':
@@ -75,14 +73,8 @@ if __name__ == '__main__':
     # 렌더 시작
     while True:  # 아래의 코드를 무한 반복한다.
         print('1. INIT NEW GAME')
-        # while status == STATUS_INTRO:
-        #   pass
-        # while status == STATUS_MAIN_MENU:
-        #     pass
-        #
-        # status ==
 
-        GAMES[I_GAME_1] = Game1(width, height, fps, I_GAME_1)
+        GAMES[I_GAME_1] = HnooPlatformGame(width, height, fps, I_GAME_1)
         GAMES[I_GAME_2] = Game2(width, height, fps, I_GAME_2)
         GAMES[I_INTRO] = Game3(width, height, fps, I_INTRO)
         GAMES[I_MAIN_MENU] = Game4(width, height, fps, I_MAIN_MENU)

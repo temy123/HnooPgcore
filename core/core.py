@@ -4,6 +4,7 @@ import sys
 from abc import abstractmethod
 
 from pygame.locals import *
+from core.sprite import RenderModel
 
 
 class KeyBindings:
@@ -55,9 +56,10 @@ class KeyBindings:
 
 class GameModel:
 
-    def __init__(self, render_model=None, render_rect=pygame.Rect(0, 0, 0, 0)):
-        self.model = render_model
-        self.rect = render_rect
+    def __init__(self, sprite_model=None, sprite_rect=pygame.Rect(0, 0, 0, 0)):
+        # 기본적으로 RenderModel 을 사용하는 것을 추천
+        self.sprite = sprite_model
+        self.sprite_rect = sprite_rect
 
     def bind_single_key(self, event_):
         pass
@@ -66,8 +68,8 @@ class GameModel:
         pass
 
     def unload(self):
-        self.model = None
-        self.rect = None
+        self.sprite = None
+        self.sprite_rect = None
 
 
 class BaseGame:
@@ -110,6 +112,9 @@ class BaseGame:
         # 연속 된 키 입력 처리
         self.process_pressed_key_event()
 
+        # 애니메이션 처리
+        self._blit_sprites()
+
         # 화면 만들기
         self._make_screen()
 
@@ -122,6 +127,13 @@ class BaseGame:
     @abstractmethod
     def _make_screen(self):
         pass
+
+    # 게임 모델들의 다음 애니메이션 동작을 갱신 시켜 줌
+    # HnooPygame 의 sprite.RenderModel 인 경우에만 실행 됨
+    def _blit_sprites(self):
+        for model in self.model:
+            if type(model['game_model'].sprite) == RenderModel:
+                model['game_model'].sprite.next_frame()
 
     def process_single_key_event(self, event):
         for model in self.model:
@@ -148,8 +160,12 @@ class GameComponent:
     def fill(self, color):
         self.display.fill(color)  # displaysurf를 하얀색으로 채운다
 
+    # 간단하게 게임 모델의 내용을 표시하고 싶은 경우
     def show(self, model: GameModel):
-        self.display.blit(model.model, model.rect)
+        if type(model.sprite) == RenderModel:
+            self.display.blit(model.sprite.image, model.sprite_rect)
+        else:
+            self.display.blit(model.sprite, model.sprite_rect)
 
     def get_center(self):
         return self.width / 2, self.height / 2

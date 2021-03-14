@@ -1,5 +1,5 @@
 import pygame
-from core import BaseGame, GameModel, GameComponent, KeyBindings
+from core.core import BaseGame, GameModel, GameComponent, KeyBindings
 
 white = (255, 255, 255)
 black = (0, 0, 0)
@@ -8,7 +8,7 @@ black = (0, 0, 0)
 # TODO: ThisGameModel 이름 변경 필요,
 class GameTwoModel(GameModel):
     def move_to_center(self, component: GameComponent):
-        self.rect.center = component.get_center()
+        self.sprite_rect.center = component.get_center()
 
 
 class HelloWorldModel(GameTwoModel):
