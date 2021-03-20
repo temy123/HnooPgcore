@@ -61,6 +61,10 @@ class KeyBindings:
     def is_key_type_down(event_):
         return event_.type == pygame.KEYDOWN
 
+    @staticmethod
+    def is_current_key_down(event_, key_code):
+        return event_.type == pygame.KEYDOWN and event_.key == key_code
+
 
 class GameModel:
 
@@ -174,6 +178,10 @@ class GameComponent:
             self.display.blit(model.sprite.image, model.sprite_rect)
         else:
             self.display.blit(model.sprite, model.sprite_rect)
+
+    # 간단하게 게임 모델의 내용을 표시하고 싶은 경우
+    def blit(self, sprite, rect):
+        self.display.blit(sprite, rect)
 
     def get_center(self):
         return self.width / 2, self.height / 2

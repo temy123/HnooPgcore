@@ -12,7 +12,7 @@ I_MAIN_MENU = 0
 I_GAME_1 = 1
 I_GAME_2 = 2
 
-status = I_INTRO
+status = I_GAME_1
 
 width = 1024  # 상수 설정
 height = 768
@@ -89,7 +89,7 @@ if __name__ == '__main__':
             # 게임이 끝난 경우 에는 메인메뉴로
             # status = I_MAIN_MENU if is_game_running(running_game) else status
 
-            handle_global_keys()
+            # handle_global_keys()
 
             print('4. equals status {result}'.format(result=status == running_game.get_status()))
 
