@@ -3,7 +3,7 @@ import sys
 from pygame.rect import Rect
 from pygame.color import Color
 
-from core.core import BaseGame, GameModel, GameComponent, KeyBindings
+from core.core import BaseGame, GameModel, GameComponent, KeyBindings, Print
 from core.sprite import RenderModel
 
 from enum import Enum, auto
@@ -24,9 +24,9 @@ BACKGROUND_HEIGHT = 64
 
 # TODO: ThisGameModel 이름 변경 필요,
 class ThisGameModel(GameModel):
-    __MAX_X_WEIGHT = 8
-    __MAX_Y_WEIGHT = 13
-    __GRAVITY_WEIGHT = 0.5
+    __MAX_X_WEIGHT = 4
+    __MAX_Y_WEIGHT = 5
+    __GRAVITY_WEIGHT = 0.4
 
     def __init__(self, sprite_model=None, sprite_rect=pygame.Rect(0, 0, 0, 0)):
         super().__init__(sprite_model, sprite_rect)
@@ -71,6 +71,7 @@ class ThisGameModel(GameModel):
 
     def add_gravity(self):
         if self.__b_gravity:
+            print('add gravity')
             self.__y_weight += self.__GRAVITY_WEIGHT
 
     def set_gravity(self, on_):
@@ -97,15 +98,18 @@ class TileSprites(ThisGameModel):
 
 
 class VirtualBoy(ThisGameModel):
+    CHARACTER_WIDTH = 32
+    CHARACTER_HEIGHT = 32
     __X_ADDITIONAL_VALUE = 0.5
-    __Y_ADDITIONAL_VALUE = 1
+    __Y_ADDITIONAL_VALUE = 0.5
     __b_leftright = False
 
     def __init__(self):
-        self.sprite = RenderModel(32, 32)
+        self.sprite = RenderModel(self.CHARACTER_WIDTH, self.CHARACTER_HEIGHT)
         self.sprite.load('img/platform-game/Main Characters/Virtual Guy/Idle (32x32).png', 11, 0, 0, Color(0, 0, 0))
-        self.rect = self.sprite.rect
-        super().__init__(self.sprite, self.rect)
+        super().__init__(self.sprite, self.sprite.rect)
+        # 충돌일 경우에는 중력 추가 하지 않음
+        self.__collision = False
         self.set_gravity(True)
 
     def move_left(self):
@@ -115,7 +119,7 @@ class VirtualBoy(ThisGameModel):
         self.add_x_weight(self.__X_ADDITIONAL_VALUE)
 
     def move_to_center(self, component: GameComponent):
-        self.rect.center = component.get_center()
+        self.sprite_rect.center = component.get_center()
 
     def bind_pressed_key(self):
         self.__b_leftright = False
@@ -128,10 +132,21 @@ class VirtualBoy(ThisGameModel):
 
     def bind_single_key(self, event_):
         if KeyBindings.is_current_key_down(event_, pygame.K_SPACE):
-            print('key down space')
+            self.set_gravity(True)
             self.set_y_weight(-10)
 
+    def set_position(self, x, y):
+        self.sprite_rect = Rect(x, y, self.CHARACTER_WIDTH, self.CHARACTER_HEIGHT)
+
+    def set_collision(self, b):
+        self.__collision = b
+
     def move(self):
+        # if self.__collision:
+        #     self.set_gravity(False)
+        # else:
+        #     self.set_gravity(True)
+
         if not self.__b_leftright:
             if self.get_x_weight() < 0:
                 self.add_x_weight(self.__X_ADDITIONAL_VALUE)
@@ -139,6 +154,7 @@ class VirtualBoy(ThisGameModel):
                 self.add_x_weight(-self.__X_ADDITIONAL_VALUE)
 
         super().move()
+        Print.print_rect('Virtual boy : ', self.sprite_rect)
 
 
 class Character(Enum):
@@ -262,21 +278,59 @@ class HnooPlatformGame(BaseGame):
                                     (x * BACKGROUND_WIDTH, y * BACKGROUND_HEIGHT))
 
     def _make_screen(self):
-        self.apply_gravity()
+        # 충돌 추가
+        self.collide_player_with_ground()
+        # 모든 모델에 move() 함수 호출
         self.move()
-
+        # 중력 추가
+        self.apply_gravity()
+        # 배경
         self.component.fill(black)
         self.__draw_background()
+
+        # 장애물 등 배경 그리기
+        self.__draw_tiles()
+        # 게임 모델 화면에 띄우기 (TODO: 만약 sprite group 을 썼다면...?)
         self.component.show(self.get_game_model(Character.Hero.name))
 
-        self.__draw_tiles()
+    def collide_player_with_ground(self):
+        wall_index = self.player.sprite_rect.collidelist(self.levels['rect_list'])
+        # print('wall_index : ' + str(wall_index))
+        wall_type = self.levels['type_list'][wall_index]
+        if wall_type != 'a' and wall_index > -1:
+            rect = self.levels['rect_list'][wall_index]
+            print('-- collide : ' + str(wall_index))
 
-        # test = self.player.rect.collidelist(self.levels['rect_list'])
-        # print('collide : ' + test)
+            Print.print_rect('-- collide : ', rect)
+            Print.print_rect('-- sprite : ', self.player.sprite_rect)
+
+            if self.player.sprite_rect.bottom > rect.top:
+                print('충돌 1')
+                self.player.sprite_rect.y = rect.top - self.player.sprite_rect.height - 1
+                # self.player.sprite_rect.bottom = rect.top - 1
+                self.player.set_gravity(False)
+                self.player.set_y_weight(0)
+
+            elif self.player.sprite_rect.top < rect.bottom:
+                print('충돌 2')
+                # self.player.sprite_rect.y = rect.y + self.player.sprite_rect.height - 1
+                self.player.sprite_rect.y = rect.bottom + 1
+                self.player.set_gravity(False)
+                self.player.set_y_weight(0)
+
+            elif self.player.sprite_rect.right > rect.left:
+                self.player.sprite_rect.x = rect.x + self.player.sprite_rect.width - 1
+                self.player.set_x_weight(0)
+
+            elif self.player.sprite_rect.left < rect.right:
+                self.player.sprite_rect.x = rect.x + 1
+                self.player.set_x_weight(0)
+
+        else:
+            self.player.set_gravity(True)
 
     def process_single_key_event(self, event):
         super().process_single_key_event(event)
-        print('single_key_event')
         if KeyBindings.is_current_key_down(event, pygame.K_ESCAPE):
             pygame.quit()  # pygame을 종료한다
             sys.exit()  # 창을 닫는다

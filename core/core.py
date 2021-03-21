@@ -7,6 +7,16 @@ from pygame.locals import *
 from core.sprite import RenderModel
 
 
+class Print:
+    @staticmethod
+    def print_rect(name, rect):
+        print('-- {name} ____ top {top}, bottom {bottom}, left {left}, right {right}, x {x}, y{y} : '.format(
+            name=name,
+            top=rect.top, bottom=rect.bottom,
+            left=rect.left, right=rect.right,
+            x=rect.x, y=rect.y))
+
+
 class KeyBindings:
     class Pressed:
         @staticmethod
@@ -176,6 +186,7 @@ class GameComponent:
     def show(self, model: GameModel):
         if type(model.sprite) == RenderModel:
             self.display.blit(model.sprite.image, model.sprite_rect)
+
         else:
             self.display.blit(model.sprite, model.sprite_rect)
 

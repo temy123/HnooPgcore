@@ -44,7 +44,7 @@ def handle_global_keys():
             status = I_GAME_2 if event.key == pygame.K_2 else status
             status = I_INTRO if event.key == pygame.K_3 else status
             status = I_MAIN_MENU if event.key == pygame.K_4 else status
-            print('status to {status}'.format(status=status))
+            # print('status to {status}'.format(status=status))
 
 
 def select_game():
@@ -72,7 +72,7 @@ if __name__ == '__main__':
 
     # 렌더 시작
     while True:  # 아래의 코드를 무한 반복한다.
-        print('1. INIT NEW GAME')
+        # print('1. INIT NEW GAME')
 
         GAMES[I_GAME_1] = HnooPlatformGame(width, height, fps, I_GAME_1)
         GAMES[I_GAME_2] = Game2(width, height, fps, I_GAME_2)
@@ -81,7 +81,7 @@ if __name__ == '__main__':
 
         running_game = select_game()
         running_game.start()
-        print('2. ================ selected game : ' + str(status))
+        # print('2. ================ selected game : ' + str(status))
 
         while status == running_game.get_status():
             running_game.update()
@@ -91,7 +91,7 @@ if __name__ == '__main__':
 
             # handle_global_keys()
 
-            print('4. equals status {result}'.format(result=status == running_game.get_status()))
+            # print('4. equals status {result}'.format(result=status == running_game.get_status()))
 
         if not is_game_running(running_game):
             break
