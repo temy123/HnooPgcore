@@ -12,7 +12,7 @@ I_MAIN_MENU = 0
 I_GAME_1 = 1
 I_GAME_2 = 2
 
-status = I_GAME_1
+status = I_GAME_2
 
 width = 1024  # 상수 설정
 height = 768

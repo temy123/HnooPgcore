@@ -35,6 +35,7 @@ class RenderModel(pygame.sprite.Sprite):
             self.image.set_colorkey(color_key)
 
         self.rect = self.image.get_rect()
+        self.image.blit(self.sprite_sheet, (0, 0), self.get_current_rect())
         return self
 
     def get_current_rect(self):
@@ -50,7 +51,7 @@ class RenderModel(pygame.sprite.Sprite):
             self.current_frame += 1
 
         self.image.blit(self.sprite_sheet, (0, 0), self.get_current_rect())
-        return self
+        return self.image
 
     # 애니메이션 시작 콜백
     def on_animation_start(self):

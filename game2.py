@@ -1,8 +1,35 @@
 import pygame
+import sys
+from pygame.color import Color
 from core.core import BaseGame, GameModel, GameComponent, KeyBindings
+from core.sprite import RenderModel
 
 white = (255, 255, 255)
 black = (0, 0, 0)
+
+TILE_XY = [
+    'a',
+    'a',
+    'a',
+    'a',
+    'a',
+    'a',
+    'a',
+    'a',
+    'a',
+    'a',
+    'a',
+    'aaaaa111aaaaaaaaaaaaaaaaaaaaaaaaaaaaaa1',
+    'aaaaa000aaaaaaaaaaaaaaaaaaaaaaaaaaaaaa0',
+    'aaaaa000aaaaaaaaaaaaaaaaaaaaaaaaaaaaaa0',
+    'aaaaa000aaaaaaaaaaaaaaaaaaaaaaaaaaaaaa0',
+    '0000011100aaaa0000000000000000000000000',
+    '1111111111aaaa1111111111111111111111111'
+]
+
+tiles = pygame.sprite.Group()
+players = pygame.sprite.Group()
+enemies = pygame.sprite.Group()
 
 
 # TODO: ThisGameModel 이름 변경 필요,
@@ -11,69 +38,71 @@ class GameTwoModel(GameModel):
         self.sprite_rect.center = component.get_center()
 
 
-class HelloWorldModel(GameTwoModel):
+class Tile(RenderModel):
+    WIDTH = 16
+    HEIGHT = 16
+
+    def __init__(self, x, y):
+        super().__init__(self.WIDTH, self.HEIGHT)
+        self.x = x
+        self.y = y
+        self.load('img/platform-game/Terrain/Terrain (16x16).png', 1, 6, 0, Color(0, 0, 0))
+        self.rect.x = self.WIDTH * x
+        self.rect.y = self.HEIGHT * y
+
+
+class VirtualBoy(RenderModel):
+    WIDTH = 32
+    HEIGHT = 32
 
     def __init__(self):
-        gulim_font = pygame.font.SysFont('굴림', 70)  # 서체 설정
-        render_text = gulim_font.render('Hello, world!', 1, black)
+        super().__init__(self.WIDTH, self.HEIGHT)
+        self.load('img/platform-game/Main Characters/Virtual Guy/Idle (32x32).png', 11, 0, 0, Color(0, 0, 0))
 
-        # .render() 함수에 내용과 안티앨리어싱, 색을 전달하여 글자 이미지 생성
-        # render_rect = render_text.get_rect()  # 생성한 이미지의 rect 객체를 가져온다
-        # render_rect.center = (width / 2, height / 2)  # 해당 rect의 중앙을 화면 중앙에 맞춘다
-        super().__init__(render_text)
-
-
-class Beetle(GameTwoModel):
-
-    def __init__(self):
-        self.sprite = pygame.image.load('img/character/2 Rhinoceros-beetle/Calm.png')
-        self.rect = self.sprite.get_rect()
-        super().__init__(self.sprite, self.rect)
-
-    def move_down(self):
-        self.rect.move_ip(0, 5)
-
-    def move_up(self):
-        self.rect.move_ip(0, -5)
-
-    def move_left(self):
-        self.rect.move_ip(-5, 0)
-
-    def move_right(self):
-        self.rect.move_ip(5, 0)
-
-    def move_to_center(self, component: GameComponent):
-        self.rect.center = component.get_center()
-
-    def bind_pressed_key(self):
-        if KeyBindings.Pressed.is_key_pressed_up():
-            self.move_up()
-        if KeyBindings.Pressed.is_key_pressed_down():
-            self.move_down()
+    def move(self):
         if KeyBindings.Pressed.is_key_pressed_left():
-            self.move_left()
-        if KeyBindings.Pressed.is_key_pressed_right():
-            self.move_right()
+            self.rect.move_ip(-3, 0)
+        elif KeyBindings.Pressed.is_key_pressed_right():
+            self.rect.move_ip(3, 0)
+        if KeyBindings.Pressed.is_key_pressed_up():
+            self.rect.move_ip(0, -3)
+        elif KeyBindings.Pressed.is_key_pressed_down():
+            self.rect.move_ip(0, 3)
 
 
 class Game2(BaseGame):
+    TILESIZE = 32
 
     def __init__(self, width, height, fps, status):
+        self.width = width
+        self.height = height
         super().__init__(fps, status)
+        self.background = pygame.display.set_mode((self.width, self.height))
         self.component = GameComponent(width, height)
+        self.player = VirtualBoy()
 
-        boss1 = Beetle()
-        boss1.move_to_center(self.component)
+        for i in range(0, 50):
+            tiles.add(Tile(i, 0))
 
-        self.add_game_model('hello', HelloWorldModel())
-        self.add_game_model('boss1', boss1)
+    def draw_grid(self):
+        # 0부터 TILESIZE씩 건너뛰면서 WIDTH까지 라인을 그려준다
+        for x in range(0, self.width, self.TILESIZE):
+            # 첫번째 인자부터 game_world(게임 화면)에 (0,0,0,50)의 색으로 차례대로 라인을 그려준다
+            pygame.draw.line(self.background, (0, 0, 0, 50), (x, 0), (x, self.width))
+        for y in range(0, self.height, self.TILESIZE):
+            pygame.draw.line(self.background, (0, 0, 0, 50), (0, y), (self.width, y))
 
     def _make_screen(self):
         self.component.fill(white)
-        self.component.show(self.get_game_model('boss1'))
+        self.draw_grid()
+        self.player.move()
+        tiles.draw(self.background)
+        self.component.blit(self.player.next_frame(), self.player.rect)
 
     def process_single_key_event(self, event):
         super().process_single_key_event(event)
         if KeyBindings.is_key_type_down(event):
             if event.key == pygame.K_ESCAPE:
+                pygame.quit()
+                sys.exit()
                 self.stop()
